@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple, focused expense tracker for understanding where your money goes.">
+  <title>Ledgerly - Expense tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Ledgerly home">
+        <span class="brand-mark" aria-hidden="true">L</span>
+        <span>ledgerly</span>
+      </a>
+      <div class="header-actions">
+        <span class="saved-status"><span class="status-dot"></span> Saved locally</span>
+        <button class="avatar" type="button" aria-label="Account menu">AM</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Personal finance, made clear</p>
+          <h1>Know where your<br><em>money goes.</em></h1>
+          <p class="hero-copy">A calm place to keep track of your spending, one small entry at a time.</p>
+        </div>
+        <div class="hero-accent" aria-hidden="true">
+          <span class="accent-ring"></span>
+          <span class="accent-line"></span>
+          <span class="accent-dot"></span>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="Spending summary">
+        <article class="summary-card total-card">
+          <div class="card-label-row">
+            <span class="card-label">Total spent</span>
+            <span class="trend-badge">This month</span>
+          </div>
+          <p class="total-value" id="total-spent">$0.00</p>
+          <p class="muted" id="entry-count">0 entries recorded</p>
+          <div class="mini-chart" aria-hidden="true">
+            <span style="height: 28%"></span><span style="height: 44%"></span><span style="height: 35%"></span><span style="height: 60%"></span><span style="height: 48%"></span><span style="height: 72%"></span><span style="height: 90%"></span>
+          </div>
+        </article>
+        <article class="summary-card insight-card">
+          <div class="card-label-row">
+            <span class="card-label">Top category</span>
+            <span class="insight-icon" aria-hidden="true">↗</span>
+          </div>
+          <p class="insight-value" id="top-category">—</p>
+          <p class="muted" id="top-category-detail">Add an expense to see your biggest spend.</p>
+          <div class="category-bar"><span id="top-category-bar"></span></div>
+        </article>
+        <article class="summary-card month-card">
+          <div class="card-label-row">
+            <span class="card-label">Average entry</span>
+            <span class="calendar-icon" aria-hidden="true">◷</span>
+          </div>
+          <p class="insight-value" id="average-spent">$0.00</p>
+          <p class="muted">Across your current entries</p>
+          <span class="month-note">Keep it up — small habits add up.</span>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <div class="expenses-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Your activity</p>
+              <h2>Recent expenses</h2>
+            </div>
+            <button class="primary-button" id="open-form" type="button"><span aria-hidden="true">+</span> Add expense</button>
+          </div>
+
+          <div class="toolbar">
+            <label class="search-box">
+              <span aria-hidden="true">⌕</span>
+              <input id="search-input" type="search" placeholder="Search expenses..." aria-label="Search expenses">
+            </label>
+            <label class="filter-select">
+              <span class="sr-only">Filter by category</span>
+              <select id="category-filter">
+                <option value="all">All categories</option>
+              </select>
+              <span aria-hidden="true">⌄</span>
+            </label>
+          </div>
+
+          <div id="expense-list" class="expense-list" aria-live="polite"></div>
+          <div class="empty-state" id="empty-state" hidden>
+            <div class="empty-icon" aria-hidden="true">✦</div>
+            <h3>No expenses here yet</h3>
+            <p>Start with your first expense and make your spending visible.</p>
+            <button class="text-button" id="empty-add" type="button">Add your first expense <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+
+        <aside class="category-panel">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">At a glance</p>
+              <h2>Category summary</h2>
+            </div>
+          </div>
+          <div id="category-summary" class="category-summary"></div>
+          <div class="tip-card">
+            <span class="tip-spark" aria-hidden="true">✦</span>
+            <div>
+              <strong>Small insight</strong>
+              <p id="spending-tip">Your spending story will appear here.</p>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="expense-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Keep a record</p>
+          <h2 id="modal-title">Add an expense</h2>
+        </div>
+        <button class="close-button" id="close-form" type="button" aria-label="Close dialog">×</button>
+      </div>
+      <form id="expense-form" novalidate>
+        <input id="expense-id" type="hidden">
+        <label class="field">
+          <span>Description</span>
+          <input id="description" name="description" type="text" placeholder="e.g. Morning coffee" maxlength="60" required>
+          <small class="field-error" id="description-error"></small>
+        </label>
+        <div class="form-row">
+          <label class="field">
+            <span>Amount</span>
+            <div class="input-with-prefix"><span>$</span><input id="amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required></div>
+            <small class="field-error" id="amount-error"></small>
+          </label>
+          <label class="field">
+            <span>Date</span>
+            <input id="date" name="date" type="date" required>
+            <small class="field-error" id="date-error"></small>
+          </label>
+        </div>
+        <label class="field">
+          <span>Category</span>
+          <select id="category" name="category" required>
+            <option value="">Choose a category</option>
+            <option>Food & dining</option>
+            <option>Transport</option>
+            <option>Shopping</option>
+            <option>Entertainment</option>
+            <option>Bills & utilities</option>
+            <option>Health</option>
+            <option>Other</option>
+          </select>
+          <small class="field-error" id="category-error"></small>
+        </label>
+        <label class="field">
+          <span>Note <small>(optional)</small></span>
+          <input id="note" name="note" type="text" maxlength="100" placeholder="Add a little context">
+        </label>
+        <div class="form-actions">
+          <button class="secondary-button" id="cancel-form" type="button">Cancel</button>
+          <button class="primary-button" type="submit">Save expense <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>
